@@ -154,6 +154,7 @@ impl<C: Client> ChainApi<C> {
 ///
 /// This is due for removal when #721 lands
 pub struct LocalContext<'a, A: 'a>(&'a Arc<A>);
+
 impl<'a, C: 'a + Client> CurrentHeight for LocalContext<'a, C> {
 	type BlockNumber = <C as CurrentHeight>::BlockNumber;
 	fn current_height(&self) -> Self::BlockNumber {
@@ -171,7 +172,7 @@ impl<'a, C: 'a + Client> Lookup for LocalContext<'a, C> {
 	type Source = Address;
 	type Target = AccountId;
 	fn lookup(&self, a: Address) -> ::std::result::Result<AccountId, &'static str> {
-		self.0.lookup(&BlockId::number(self.current_height()), a).unwrap_or(None).ok_or("error with lookup")
+		self.0.lookup(&BlockId::number(self.get_height()), a).unwrap_or(None).ok_or("error with lookup")
 	}
 }
 

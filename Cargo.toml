@@ -19,13 +19,13 @@ vergen = "2"
 
 [workspace]
 members = [
-	"core/bft",
 	"core/cli",
 	"core/client",
 	"core/client/db",
+	"core/consensus/common",
+	"core/consensus/rhd",
 	"core/executor",
 	"core/keyring",
-	"core/misbehavior-check",
 	"core/network",
 	"core/primitives",
 	"core/rpc",

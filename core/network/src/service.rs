@@ -27,7 +27,6 @@ use protocol::{Protocol, ProtocolContext, Context, ProtocolStatus, PeerInfo as P
 use config::{ProtocolConfig};
 use error::Error;
 use chain::Client;
-use message::LocalizedBftMessage;
 use specialization::Specialization;
 use on_demand::OnDemandService;
 use import_queue::AsyncImportQueue;
@@ -35,8 +34,8 @@ use runtime_primitives::traits::{Block as BlockT};
 
 /// Type that represents fetch completion future.
 pub type FetchFuture = oneshot::Receiver<Vec<u8>>;
-/// Type that represents bft messages stream.
-pub type BftMessageStream<B> = mpsc::UnboundedReceiver<LocalizedBftMessage<B>>;
+/// Type that represents consensus messages stream.
+pub type ConsensusMessageStream<B> = mpsc::UnboundedReceiver<Vec<u8>>;
 
 type TimerToken = usize;
 
@@ -100,11 +99,11 @@ pub trait ConsensusService<B: BlockT>: Send + Sync {
 	/// Maintain connectivity to given addresses.
 	fn connect_to_authorities(&self, addresses: &[String]);
 
-	/// Get BFT message stream for messages corresponding to consensus on given
+	/// Get consensus message stream for messages corresponding to consensus on given
 	/// parent hash.
-	fn bft_messages(&self, parent_hash: B::Hash) -> BftMessageStream<B>;
-	/// Send out a BFT message.
-	fn send_bft_message(&self, message: LocalizedBftMessage<B>);
+	fn messages(&self, parent_hash: B::Hash) -> ConsensusMessageStream<B>;
+	/// Send out a consensus message.
+	fn send_message(&self, message: Vec<u8>);
 }
 
 /// Service able to execute closure in the network context.

@@ -20,7 +20,7 @@ use client::{self, Client as SubstrateClient, ImportResult, ClientInfo, BlockSta
 use client::error::Error;
 use runtime_primitives::traits::{Block as BlockT, Header as HeaderT};
 use runtime_primitives::generic::BlockId;
-use runtime_primitives::bft::Justification;
+use runtime_primitives::Justification;
 use primitives::{Blake2Hasher};
 
 /// Local client abstraction for the network.
@@ -30,7 +30,7 @@ pub trait Client<Block: BlockT>: Send + Sync {
 		&self,
 		origin: BlockOrigin,
 		header: Block::Header,
-		justification: Justification<Block::Hash>,
+		justification: Justification,
 		body: Option<Vec<Block::Extrinsic>>,
 		finalized: bool,
 	) -> Result<ImportResult, Error>;
@@ -51,7 +51,7 @@ pub trait Client<Block: BlockT>: Send + Sync {
 	fn body(&self, id: &BlockId<Block>) -> Result<Option<Vec<Block::Extrinsic>>, Error>;
 
 	/// Get block justification.
-	fn justification(&self, id: &BlockId<Block>) -> Result<Option<Justification<Block::Hash>>, Error>;
+	fn justification(&self, id: &BlockId<Block>) -> Result<Option<Justification>, Error>;
 
 	/// Get block header proof.
 	fn header_proof(&self, block_number: <Block::Header as HeaderT>::Number) -> Result<(Block::Header, Vec<Vec<u8>>), Error>;
@@ -72,7 +72,7 @@ impl<B, E, Block> Client<Block> for SubstrateClient<B, E, Block> where
 		&self,
 		origin: BlockOrigin,
 		header: Block::Header,
-		justification: Justification<Block::Hash>,
+		justification: Justification,
 		body: Option<Vec<Block::Extrinsic>>,
 		finalized: bool,
 	) -> Result<ImportResult, Error> {
@@ -101,7 +101,7 @@ impl<B, E, Block> Client<Block> for SubstrateClient<B, E, Block> where
 		(self as &SubstrateClient<B, E, Block>).body(id)
 	}
 
-	fn justification(&self, id: &BlockId<Block>) -> Result<Option<Justification<Block::Hash>>, Error> {
+	fn justification(&self, id: &BlockId<Block>) -> Result<Option<Justification>, Error> {
 		(self as &SubstrateClient<B, E, Block>).justification(id)
 	}
 
